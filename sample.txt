@@ -1,1 +1,2 @@
-Welcome Everyone to the git;
+Welcome Everyone to the git
+welcome everyone to the git
