@@ -1,31 +1,38 @@
 pipeline {
-    agent any
-    
+    agent {
+        label 'slave'
+    }
+
     stages {
-        stage('Print Hostname')
-                steps{
-                sh 'Hostname'
+        stage('Check OS Version') {
+            steps {
+                sh 'cat /etc/os-release'
             }
         }
-        stage('Ip Address'){
-        steps{
-            sh'hostname -I'
-        }     
-    }
-stage ('Cpu Details'){
-    steps{
-sh 'lscpu'
-    }
-}
-stage('Disk uage'){
-    steps{
-        sh 'df -kh'
-    }
-}
-    stage('Memory usage'){
-        steps{
-            sh 'free -h'
+
+        stage('List Running Services') {
+            steps {
+                sh 'systemctl list-units --type=service --state=running'
+            }
+        }
+
+        stage('Show Network Interfaces') {
+            steps {
+                sh 'ip addr show'
+            }
+        }
+
+        stage('Check Open Ports') {
+            steps {
+                sh 'ss -tuln'
+            }
+        }
+
+        stage('Uptime') {
+            steps {
+                sh 'uptime'
+            }
         }
     }
 }
-}
+
