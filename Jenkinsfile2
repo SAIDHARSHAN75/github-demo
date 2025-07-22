@@ -20,9 +20,9 @@ pipeline {
             }
         }
         stage('Disk usage'){
-        }
-        steps{
+            steps{
             sh 'df -kh'
+            }
         }
     }
     stage('memory usage'){
