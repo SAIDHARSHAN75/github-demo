@@ -18,7 +18,6 @@ pipeline {
             }
         }
         stage('Disk usage'){
-        }
         steps{
             sh 'df -kh'
         }
@@ -28,4 +27,5 @@ pipeline {
             sh 'free -h'
         }
     }        
+  }
 }
