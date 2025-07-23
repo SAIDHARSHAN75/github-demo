@@ -4,14 +4,13 @@ pipeline {
     environment {
         IMAGE_NAME = "hanuman-site"
         CONTAINER_NAME = "hanuman-container"
-        DOCKERHUB_USER = "saidharshan706"
-        PORT = "8080"
+        DOCKERHUB_USER = "saidharshan706"   //
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                git 'https://github.com/saidharshan706/hanuman-ci-cd.git'
+                git 'https://github.com/SAIDHARSHAN75/hanuman-ci-cd.git' //
             }
         }
 
