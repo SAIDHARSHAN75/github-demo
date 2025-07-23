@@ -2,15 +2,23 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "hanuman-site"
-        CONTAINER_NAME = "hanuman-container"
-        DOCKERHUB_USER = "saidharshan706"   //
+        IMAGE_NAME = "hanuman-java-app"
+        DOCKERHUB_USER = "saidharshan706"
+        CONTAINER_NAME = "hanuman-java"
+        CREDENTIALS_ID = "dockerhub-creds"
+        PORT = "8080"
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-                git 'https://github.com/SAIDHARSHAN75/hanuman-ci-cd.git' //
+                git credentialsId: 'github-creds', url: 'https://github.com/SAIDHARSHAN75/java-hanuman-app.git'
+            }
+        }
+
+        stage('Build with Maven') {
+            steps {
+                sh 'mvn clean package'
             }
         }
 
@@ -22,34 +30,6 @@ pipeline {
             }
         }
 
-        stage('Docker Hub Login') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
-                }
-            }
-        }
-
         stage('Push to Docker Hub') {
             steps {
-                sh "docker push ${DOCKERHUB_USER}/${IMAGE_NAME}:${BUILD_NUMBER}"
-            }
-        }
-
-        stage('Deploy Container') {
-            steps {
-                sh "docker rm -f ${CONTAINER_NAME} || true"
-                sh "docker run -d --name ${CONTAINER_NAME} -p ${PORT}:80 ${DOCKERHUB_USER}/${IMAGE_NAME}:${BUILD_NUMBER}"
-            }
-        }
-    }
-
-    post {
-        success {
-            echo "🚀 Jai Hanuman! Visit: http://<your-ip>:${PORT}"
-        }
-        failure {
-            echo "❌ Something went wrong. Jai Bajrang Bali still blesses you!"
-        }
-    }
-}
+                withCredentials([usernamePassword(credentialsId: "${CREDENTIALS]()
