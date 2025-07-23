@@ -1,38 +1,56 @@
 pipeline {
-    agent {
-        label 'slave'
+    agent any
+
+    environment {
+        IMAGE_NAME = "hanuman-site"
+        CONTAINER_NAME = "hanuman-container"
+        DOCKERHUB_USER = "saidharshan706"
+        PORT = "8080"
     }
 
     stages {
-        stage('Check OS Version') {
+        stage('Checkout Code') {
             steps {
-                sh 'cat /etc/os-release'
+                git 'https://github.com/saidharshan706/hanuman-ci-cd.git'
             }
         }
 
-        stage('List Running Services') {
+        stage('Build Docker Image') {
             steps {
-                sh 'systemctl list-units --type=service --state=running'
+                script {
+                    dockerImage = docker.build("${DOCKERHUB_USER}/${IMAGE_NAME}:${BUILD_NUMBER}")
+                }
             }
         }
 
-        stage('Show Network Interfaces') {
+        stage('Docker Hub Login') {
             steps {
-                sh 'ip addr show'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
+                }
             }
         }
 
-        stage('Check Open Ports') {
+        stage('Push to Docker Hub') {
             steps {
-                sh 'ss -tuln'
+                sh "docker push ${DOCKERHUB_USER}/${IMAGE_NAME}:${BUILD_NUMBER}"
             }
         }
 
-        stage('Uptime') {
+        stage('Deploy Container') {
             steps {
-                sh 'uptime'
+                sh "docker rm -f ${CONTAINER_NAME} || true"
+                sh "docker run -d --name ${CONTAINER_NAME} -p ${PORT}:80 ${DOCKERHUB_USER}/${IMAGE_NAME}:${BUILD_NUMBER}"
             }
         }
     }
-}
 
+    post {
+        success {
+            echo "🚀 Jai Hanuman! Visit: http://<your-ip>:${PORT}"
+        }
+        failure {
+            echo "❌ Something went wrong. Jai Bajrang Bali still blesses you!"
+        }
+    }
+}
