@@ -26,3 +26,8 @@ pipeline {
             steps {
                 script {
                     d
+                }
+            }
+        }
+    }
+}
